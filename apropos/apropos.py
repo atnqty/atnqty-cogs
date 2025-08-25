@@ -115,7 +115,7 @@ class Apropos(commands.Cog):
                                 i += 1
                                 # pages.append(f"## {word}\n*{meaning.part_of_speech}*\n{definition.definition}")
                                 log.info(f"{word} ({meaning.part_of_speech}): {definition.definition}")
-                        await message.reply(content=msg)
+                        await message.reply(content=msg, , allowed_mentions=None)
                 # if not pages:
                 #     return
                 # elif len(pages) == 1:
