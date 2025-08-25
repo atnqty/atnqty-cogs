@@ -1,11 +1,11 @@
 import re
-import time
+from time import time
 import discord
 import logging
 from freedictionaryapi.clients.sync_client import DictionaryApiClient
 from freedictionaryapi.errors import DictionaryApiError
 from wordfreq import zipf_frequency
-from typing import Set, Dict, Optional
+from typing import Dict, List, Optional
 from redbot.core import commands, Config
 from redbot.core.bot import Red
 from redbot.core.utils.views import SimpleMenu
@@ -13,14 +13,9 @@ from redbot.core.utils.views import SimpleMenu
 log = logging.getLogger("red.crab-cogs.apropos")
 client = DictionaryApiClient()
 
-
 def batched(lst: list, n: int):
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
-
-def is_regional_indicator(string: str):
-    return string.strip() in "🇦🇧🇨🇩🇪🇫🇬🇭🇮🇯🇰🇱🇲🇳🇴🇵🇶🇷🇸🇹🇺🇻🇼🇽🇾🇿"
-
 
 class Apropos(commands.Cog):
     """Detect rarely used words e.g. apropos and show definitions."""
@@ -90,15 +85,17 @@ class Apropos(commands.Cog):
                 for word in aproposes:
                     self.aprocdict.setdefault(message.guild.id, {})
                     async with self.config.guild(message.guild).aprocdict() as aprocdict:
-                        previous_time = 0
-                        time_now = time.time()
+                        previous_expiration = 0
+                        time_now = time()
                         aprocd = self.aprocd.get(message.guild.id, None)
                         if word in self.aprocdict[message.guild.id]:
-                            previous_time = self.aprocdict[message.guild.id][word]
-                        aprocdict[word] = time_now
-                        self.aprocdict[message.guild.id][word] = time_now
-                        if (time_now > previous_time + aprocd):
+                            previous_expiration = self.aprocdict[message.guild.id][word]
+                        new_time = max(previous_expiration + aprocd, time_now + aprocd)
+                        if (time_now > previous_expiration):
                             aproposes_real.add(word)
+                        aprocdict[word] = new_time
+                        self.aprocdict[message.guild.id][word] = new_time
+
                 for word in aproposes_real:
                     worddefs = None
                     try:
@@ -213,9 +210,14 @@ class Apropos(commands.Cog):
                 if not (ctx.guild.get_member(uid)):
                     await ctx.send(f"User ID {uid} not found")
                     continue
-                removed1 = aprouids.remove(uid)
-                removed2 = self.aprouids[ctx.guild.id].remove(uid)
-                if removed1 or removed2:
+                removed = False
+                if uid in aprouids:
+                    aprouids.remove(uid)
+                    removed = True
+                if uid in self.aprouids[ctx.guild.id]:
+                    self.aprouids[ctx.guild.id].remove(uid)
+                    removed = True
+                if removed:
                     await ctx.tick(message="UID removed")
                 else:
                     await ctx.send("UID not found")
@@ -267,9 +269,14 @@ class Apropos(commands.Cog):
                 if not zipf_frequency(word, "en"):
                     await ctx.send(f"{word} not a word")
                     continue
-                removed1 = aprobl.remove(word)
-                removed2 = self.aprobl[ctx.guild.id].remove(word)
-                if removed1 or removed2:
+                removed = False
+                if word in aprobl:
+                    aprobl.remove(word)
+                    removed = True
+                if word in self.aprobl[ctx.guild.id]:
+                    self.aprobl[ctx.guild.id].remove(word)
+                    removed = True
+                if removed:
                     await ctx.tick(message=f"Word {word} removed from blacklist")
                 else:
                     await ctx.send(f"Word {word} not found in blacklist")
@@ -289,5 +296,5 @@ class Apropos(commands.Cog):
             embed.description = '\n'.join(batch)
             pages.append(embed)
         await SimpleMenu(pages, timeout=300).start(ctx)
-        
+
 
