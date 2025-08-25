@@ -1,0 +1,12 @@
+{
+    "author": ["atnqty"],
+    "min_bot_version": "3.5.0",
+    "description": "Detect rarely used words e.g. apropos and show definitions.",
+    "hidden": false,
+    "install_msg": "⏺ __**Apropos**__\n```Cog installed. Instructions:\n1. Load it with [p]load apropos\n2. By default it only monitors messages from certain user ids, add them with [p]apropos uidadd <uid>, remove with [p]apropos uidremove <uid>, and list them out with [p]apropos uidlist <uid>.\n3. Toggle between monitoring all or specific users with [p]apropos detect.\n4. List words in blacklist with [p]apropos blacklist, add word to blacklist with [p]apropos bladd <word>, and remove word with [p]apropos blremove <word>\n5. Use [p]apropos minf <freq> and [p]apropos maxf <freq> to adjust the sensitivity\n6. Use [p]apropos cooldown <seconds> to adjust cooldown (default 7 days) for same word```",
+    "required_cogs": {},
+    "requirements": ["python-freeDictionaryAPI", "wordfreq", "httpx"],
+    "short": "Detect rare words and show definitions.",
+    "end_user_data_statement": "This cog does not store any user data.",
+    "tags": ["word", "dictionary", "utility"]
+}
