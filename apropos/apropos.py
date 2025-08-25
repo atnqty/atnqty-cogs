@@ -244,7 +244,7 @@ class Apropos(commands.Cog):
         self.aprobl.setdefault(ctx.guild.id, [])
         async with self.config.guild(ctx.guild).aprobl() as aprobl:
             for word in words:
-                word = ''.join(ch for ch in bl if ch not in string.punctuation)
+                # word = ''.join(ch for ch in bl if ch not in string.punctuation)
                 if not zipf_frequency(word, "en"):
                     await ctx.send(f"{word} not a word")
                     continue
@@ -263,7 +263,7 @@ class Apropos(commands.Cog):
         self.aprobl.setdefault(ctx.guild.id, [])
         async with self.config.guild(ctx.guild).aprobl() as aprobl:
             for word in words:
-                word = ''.join(ch for ch in bl if ch not in string.punctuation)
+                # word = ''.join(ch for ch in bl if ch not in string.punctuation)
                 if not zipf_frequency(word, "en"):
                     await ctx.send(f"{word} not a word")
                     continue
