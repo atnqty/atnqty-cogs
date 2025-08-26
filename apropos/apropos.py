@@ -317,7 +317,7 @@ class Apropos(commands.Cog):
         """Find zipf frequency of words."""
         if not entries:
             await ctx.send_help()
-            continue
+            return
         entry = " ".join(entries)
         words = re.split('[^a-zA-Z]', entry)
         zipfs = [f"{word}: {zipf_frequency(word, 'en', wordlist='large')}" for word in words if word]
