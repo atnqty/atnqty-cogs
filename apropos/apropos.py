@@ -32,7 +32,8 @@ class Apropos(commands.Cog):
         self.aprocd: Dict[int, int] = {}
         # self.aprocdow: Dict[int, bool] = {}
         self.aprocdict: Dict[int, Dict[str, float]] = {}
-        self.config.register_guild(aprominf=1.0, apromaxf=2.7, aproall=False, aprouids=[], aprobl=[], aprocd=604800, aprocdict={})
+        self.aprominlen: Dict[int, int] = {}
+        self.config.register_guild(aprominf=1.0, apromaxf=2.7, aproall=False, aprouids=[], aprobl=[], aprocd=604800, aprocdict={}, aprominlen=5)
 
     async def cog_load(self):
         all_config = await self.config.all_guilds()
@@ -43,6 +44,7 @@ class Apropos(commands.Cog):
         self.aprobl = {guild_id: conf['aprobl'] for guild_id, conf in all_config.items()}
         self.aprocd = {guild_id: conf['aprocd'] for guild_id, conf in all_config.items()}
         self.aprocdict = {guild_id: conf['aprocdict'] for guild_id, conf in all_config.items()}
+        self.aprominlen = {guild_id: conf['aprominlen'] for guild_id, conf in all_config.items()}
 
     # Listeners
 
@@ -62,6 +64,7 @@ class Apropos(commands.Cog):
         aprouid = self.aprouids.get(message.guild.id, None)
         aproall = self.aproall.get(message.guild.id, None)
         if ((aprouid and (message.author.id in aprouid)) or aproall):
+            aprominlen = self.aprominlen.get(message.guild.id, None)
             aprominf = self.aprominf.get(message.guild.id, None)
             apromaxf = self.apromaxf.get(message.guild.id, None)
             # log.info(f"Parsing {message.content}")
@@ -71,6 +74,8 @@ class Apropos(commands.Cog):
             # for chunk in chunks:
             #     word = ''.join(ch for ch in chunk if ch not in string.punctuation)
             for chunk in chunks:
+                if aprominlen and (len(chunk) < aprominlen):
+                    continue
                 if aprobl and (chunk in aprobl):
                     continue
                 zipf=zipf_frequency(chunk, 'en', wordlist='large', minimum=aprominf)
@@ -297,4 +302,26 @@ class Apropos(commands.Cog):
             pages.append(embed)
         await SimpleMenu(pages, timeout=300).start(ctx)
 
+    @apropos.command()
+    @commands.has_permissions(manage_guild=True)
+    async def minlen(self, ctx: commands.Context, minlen: Optional[float]):
+        """Set the minimum length of words to detect. Default 5."""
+        if minlen is None:
+            return await ctx.send(f"The current minimum length is {self.aprominlen.get(ctx.guild.id, None)}")
+        await self.config.guild(ctx.guild).aprominlen.set(minlen)
+        self.aprominlen[ctx.guild.id] = minlen
+        await ctx.send(f"✅ The new minimum length is {minlen}")
 
+    @commands.command()
+    async def zipf(self, ctx: commands.Context, entry: str):
+        """Find zipf frequency of words."""
+        words = re.split('[^a-zA-Z]', entry)
+        zipfs = [f"{word}: {zipf_frequency(word, 'en', wordlist='large')}" for word in words if word]
+        pages = []
+        for i, batch in enumerate(batched(zipfs, 10)):
+            embed = discord.Embed(title="Zipf Frequency", color=await ctx.embed_color())
+            if len(zipfs) > 10:
+                embed.set_footer(text=f"Page {i+1}/{(9+len(zipfs))//10}")
+            embed.description = '\n'.join(batch)
+            pages.append(embed)
+        await SimpleMenu(pages, timeout=300).start(ctx)
