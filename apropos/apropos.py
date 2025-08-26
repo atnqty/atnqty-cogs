@@ -315,9 +315,9 @@ class Apropos(commands.Cog):
     @commands.command()
     async def zipf(self, ctx: commands.Context, *entries: Optional[str]):
         """Find zipf frequency of words."""
-            if not entries:
-                await ctx.send_help()
-                continue
+        if not entries:
+            await ctx.send_help()
+            continue
         entry = " ".join(entries)
         words = re.split('[^a-zA-Z]', entry)
         zipfs = [f"{word}: {zipf_frequency(word, 'en', wordlist='large')}" for word in words if word]
