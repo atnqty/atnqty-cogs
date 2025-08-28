@@ -1,0 +1,12 @@
+{
+    "author": ["atnqty"],
+    "min_bot_version": "3.5.0",
+    "description": "Make Hi Hungry I'm dad joke.",
+    "hidden": false,
+    "install_msg": "⏺ __**Hi Hungry**__\n```Cog installed. Instructions:\n1. Load it with [p]load hihungry\n2. Set maximum words with [p]hihungry maxlen <word num>\n2. Set chance with [p]hihungry chance <float>\n3. Toggle if it triggers only on single sentence message with [p]hihungry single.```",
+    "required_cogs": {},
+    "requirements": [],
+    "short": "Make Hi Hungry I'm dad joke.",
+    "end_user_data_statement": "This cog does not store any user data.",
+    "tags": ["fun", "joke"]
+}

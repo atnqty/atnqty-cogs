@@ -10,7 +10,7 @@ from redbot.core import commands, Config
 from redbot.core.bot import Red
 from redbot.core.utils.views import SimpleMenu
 
-log = logging.getLogger("red.crab-cogs.apropos")
+log = logging.getLogger("red.atnqty-cogs.apropos")
 client = DictionaryApiClient()
 
 def batched(lst: list, n: int):
