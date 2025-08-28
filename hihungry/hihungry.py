@@ -47,9 +47,9 @@ class HiHungry(commands.Cog):
         started = False
         buffer = ''
         words = 0
-        hhmaxlen = self.config.guild(message.guild).hhmaxlen
-        hhchance = self.config.guild(message.guild).hhchance
-        hhsingle = self.config.guild(message.guild).hhsingle
+        hhmaxlen = await self.config.guild(message.guild).hhmaxlen()
+        hhchance = await self.config.guild(message.guild).hhchance()
+        hhsingle = await self.config.guild(message.guild).hhsingle()
         for c in msg:
             if started:
                 if c == ' ':
