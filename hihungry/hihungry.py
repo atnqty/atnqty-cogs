@@ -3,7 +3,7 @@ from time import time
 from random import random
 import discord
 import logging
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 from redbot.core import commands, Config
 from redbot.core.bot import Red
 from redbot.core.utils.views import SimpleMenu
