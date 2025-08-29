@@ -20,7 +20,7 @@ class HiHungry(commands.Cog):
         self.hhmaxlen: Dict[int, int] = {}
         self.hhchance: Dict[int, float] = {}
         self.hhsingle: Dict[int, bool] = {}
-        self.config.register_guild(hhmaxlen=999, hhchance=0.1, hhsingle=False)
+        self.config.register_guild(hhmaxlen=999, hhchance=0, hhsingle=False)
 
     async def cog_load(self):
         all_config = await self.config.all_guilds()
