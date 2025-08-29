@@ -150,7 +150,7 @@ class HiHungry(commands.Cog):
     async def single(self, ctx: commands.Context):
         """Toggle between detecting only single sentence no punctuation message or not."""
         hhsingle = self.hhsingle.get(ctx.guild.id, None)
-        self.aprocdict.setdefault(ctx.guild.id, False)
+        self.hhsingle.setdefault(ctx.guild.id, False)
         toggled_single = not hhsingle
         await self.config.guild(ctx.guild).hhsingle.set(toggled_single)
         self.hhsingle[ctx.guild.id] = toggled_single
