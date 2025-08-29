@@ -69,6 +69,7 @@ class HiHungry(commands.Cog):
                             buffer = buffer[:-1]
                         if c == '>':
                             emote = False
+                            continue
                         if emote:
                             continue
                         elif buffer.endswith(' _'):
