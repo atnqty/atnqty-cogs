@@ -70,7 +70,7 @@ class HiHungry(commands.Cog):
                         #     emote = False
                         # if emote:
                         #     buffer += c
-                        elif not buffer or buffer[-1] == ' ':
+                        if not buffer or buffer[-1] == ' ':
                             buffer += c.upper()
                         else:
                             buffer += c.lower()
