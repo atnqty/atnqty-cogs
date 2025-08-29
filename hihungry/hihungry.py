@@ -47,22 +47,33 @@ class HiHungry(commands.Cog):
         started = False
         buffer = ''
         words = 0
+        emote = False
         hhmaxlen = await self.config.guild(message.guild).hhmaxlen()
         hhchance = await self.config.guild(message.guild).hhchance()
         hhsingle = await self.config.guild(message.guild).hhsingle()
         for c in msg:
+            # log.info(f"{words} {hhmaxlen} {buffer}")
             if started:
                 if c == ' ':
                     if not buffer or buffer[-1] == ' ':
                         continue
                     else:
-                        if words > hhmaxlen:
-                            return
-                        buffer += c.upper()
+                        buffer += c
                         words += 1
                 else:
+                    if words >= hhmaxlen:
+                        return
                     if c.isalnum() or c in "'-<>:()":
-                        buffer += c.lower()
+                        if buffer and buffer[-1] == '<' and c == ':':
+                            emote = True
+                        if c == '>':
+                            emote = False
+                        if emote:
+                            buffer += c
+                        elif not buffer or buffer[-1] == ' ':
+                            buffer += c.upper()
+                        else:
+                            buffer += c.lower()
                     else:
                         if hhsingle:
                             return
@@ -73,7 +84,7 @@ class HiHungry(commands.Cog):
                 if c == ' ':
                     if not buffer:
                         continue
-                    if buffer.lower() in ["i'm","i am"]:
+                    if buffer.lower() in ["im","i'm","i am"]:
                         started = True
                         buffer = ''
                     else:
@@ -85,10 +96,11 @@ class HiHungry(commands.Cog):
                     if c not in "i'am":
                         return
                     buffer += c
-                    if buffer.lower() not in ["i","i'","i'm","i a","i am"]:
+                    if buffer.lower() not in ["i","im","i'","i'm","i a","i am"]:
                         return
         if random() < hhchance:
-            await message.reply(content=f'Hi {buffer}, I am {self.bot.user.name}', allowed_mentions=discord.AllowedMentions.none())
+            buffer = re.sub(r'\S*<a?:\S+:\d+>\S*', ' ', buffer)
+            await message.reply(content=f'Hi {buffer.strip()}, I am {self.bot.user.name}', allowed_mentions=discord.AllowedMentions.none())
 
     async def is_valid_red_message(self, message: discord.Message) -> bool:
         return await self.bot.allowed_by_whitelist_blacklist(message.author) \
@@ -97,7 +109,7 @@ class HiHungry(commands.Cog):
 
     # Commands
 
-    @commands.group(invoke_without_command=True)
+    @commands.group(aliases=["hungry"], invoke_without_command=True)
     @commands.guild_only()
     async def hihungry(self, ctx: commands.Context):
         """Make Hi Hungry I'm dad joke."""
