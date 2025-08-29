@@ -64,7 +64,7 @@ class HiHungry(commands.Cog):
                     if words >= hhmaxlen:
                         return
                     if c.isalnum() or c in "'-<>:()_*~`|":
-                        if buffer and buffer[-1] == '<' and c == ':':
+                        if buffer and c == ':' and (buffer.endswith('<') or buffer.endswith('<a') or buffer.endswith('<A')):
                             emote = True
                             buffer = buffer[:-1]
                         if c == '>':
