@@ -47,7 +47,7 @@ class HiHungry(commands.Cog):
         started = False
         buffer = ''
         words = 0
-        emote = False
+        # emote = False
         hhmaxlen = await self.config.guild(message.guild).hhmaxlen()
         hhchance = await self.config.guild(message.guild).hhchance()
         hhsingle = await self.config.guild(message.guild).hhsingle()
@@ -63,13 +63,13 @@ class HiHungry(commands.Cog):
                 else:
                     if words >= hhmaxlen:
                         return
-                    if c.isalnum() or c in "'-<>:()":
-                        if buffer and buffer[-1] == '<' and c == ':':
-                            emote = True
-                        if c == '>':
-                            emote = False
-                        if emote:
-                            buffer += c
+                    if c.isalnum() or c in "'-<>:()*~`_":
+                        # if buffer and buffer[-1] == '<' and c == ':':
+                        #     emote = True
+                        # if c == '>':
+                        #     emote = False
+                        # if emote:
+                        #     buffer += c
                         elif not buffer or buffer[-1] == ' ':
                             buffer += c.upper()
                         else:
@@ -99,7 +99,9 @@ class HiHungry(commands.Cog):
                     if buffer.lower() not in ["i","im","i'","i'm","i a","i am"]:
                         return
         if random() < hhchance:
-            buffer = re.sub(r'\S*<a?:\S+:\d+>\S*', ' ', buffer)
+            buffer = re.sub(r'\S*<a?:\S+:\d+>\S*', ' ', buffer) # remove emotes
+            buffer = re.sub(r'[*~`]', '', buffer) # remove markdown
+            buffer = re.sub(r'(?<!\w)_(?!\w)|(?<!\w)_(?=\W)|(?<=\W)_(?!\w)', '', buffer) # remove markdown underscore
             await message.reply(content=f'Hi {buffer.strip()}, I am {self.bot.user.name}', allowed_mentions=discord.AllowedMentions.none())
 
     async def is_valid_red_message(self, message: discord.Message) -> bool:
