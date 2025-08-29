@@ -107,8 +107,9 @@ class HiHungry(commands.Cog):
             # buffer = re.sub(r'(?<!\w)_(?!\w)|(?<!\w)_(?=\W)|(?<=\W)_(?!\w)', '', buffer) # remove markdown underscore
             buffer = re.sub(r'\s*\|\|.*?\|\|\s*', ' ', buffer) # remove spoilered cuz lol
             buffer = buffer.strip()
-            if buffer:
-                await message.reply(content=f"Hi {buffer}, I'm {self.bot.user.name}", allowed_mentions=discord.AllowedMentions.none())
+            bot_msg = f"Hi {buffer}, I'm {self.bot.user.name}"
+            if buffer and len(bot_msg) < 2000:
+                await message.reply(content=bot_msg, allowed_mentions=discord.AllowedMentions.none())
 
     async def is_valid_red_message(self, message: discord.Message) -> bool:
         return await self.bot.allowed_by_whitelist_blacklist(message.author) \
