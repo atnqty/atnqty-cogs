@@ -47,7 +47,7 @@ class HiHungry(commands.Cog):
         started = False
         buffer = ''
         words = 0
-        # emote = False
+        emote = False
         hhmaxlen = await self.config.guild(message.guild).hhmaxlen()
         hhchance = await self.config.guild(message.guild).hhchance()
         hhsingle = await self.config.guild(message.guild).hhsingle()
@@ -63,17 +63,20 @@ class HiHungry(commands.Cog):
                 else:
                     if words >= hhmaxlen:
                         return
-                    if c.isalnum() or c in "'-<>:()*~`_":
-                        # if buffer and buffer[-1] == '<' and c == ':':
-                        #     emote = True
-                        # if c == '>':
-                        #     emote = False
-                        # if emote:
-                        #     buffer += c
-                        if not buffer or buffer[-1] == ' ':
+                    if c.isalnum() or c in "'-<>:()_*~`|":
+                        if buffer and buffer[-1] == '<' and c == ':':
+                            emote = True
+                            buffer = buffer[:-1]
+                        if c == '>':
+                            emote = False
+                        if emote:
+                            continue
+                        elif buffer.endswith(' _'):
                             buffer += c.upper()
-                        else:
+                        elif buffer and (buffer[-1].isalnum() or buffer[-1] in "_'-"):
                             buffer += c.lower()
+                        else:
+                            buffer += c.upper()
                     else:
                         if hhsingle:
                             return
@@ -84,25 +87,28 @@ class HiHungry(commands.Cog):
                 if c == ' ':
                     if not buffer:
                         continue
-                    if buffer.lower() in ["im","i'm","i am"]:
+                    if buffer in ["im","i'm","i am"]:
                         started = True
                         buffer = ''
                     else:
-                        if buffer.lower() == "i":
-                            buffer += c
+                        if buffer == "i":
+                            buffer += c.lower()
                         else:
                             return
                 else:
-                    if c not in "i'am":
+                    if c not in "i'amIAM":
                         return
-                    buffer += c
-                    if buffer.lower() not in ["i","im","i'","i'm","i a","i am"]:
+                    buffer += c.lower()
+                    if buffer not in ["i","im","i'","i'm","i a","i am"]:
                         return
         if random() < hhchance:
-            buffer = re.sub(r'\S*<a?:\S+:\d+>\S*', ' ', buffer) # remove emotes
-            buffer = re.sub(r'[*~`]', '', buffer) # remove markdown
-            buffer = re.sub(r'(?<!\w)_(?!\w)|(?<!\w)_(?=\W)|(?<=\W)_(?!\w)', '', buffer) # remove markdown underscore
-            await message.reply(content=f'Hi {buffer.strip()}, I am {self.bot.user.name}', allowed_mentions=discord.AllowedMentions.none())
+            # buffer = re.sub(r'\S*<a?:\S+:\d+>\S*', ' ', buffer) # remove emotes
+            # buffer = re.sub(r'[*~`]', '', buffer) # remove markdown
+            # buffer = re.sub(r'(?<!\w)_(?!\w)|(?<!\w)_(?=\W)|(?<=\W)_(?!\w)', '', buffer) # remove markdown underscore
+            buffer = re.sub(r'\s*\|\|.*?\|\|\s*', ' ', buffer) # remove spoilered cuz lol
+            buffer = buffer.strip()
+            if buffer:
+                await message.reply(content=f"Hi {buffer}, I'm {self.bot.user.name}", allowed_mentions=discord.AllowedMentions.none())
 
     async def is_valid_red_message(self, message: discord.Message) -> bool:
         return await self.bot.allowed_by_whitelist_blacklist(message.author) \
@@ -141,10 +147,10 @@ class HiHungry(commands.Cog):
     @commands.has_permissions(manage_guild=True)
     async def single(self, ctx: commands.Context):
         """Toggle between detecting only single sentence no punctuation message or not."""
-        toggled_single = not self.hhsingle[ctx.guild.id]
-        await self.config.guild(ctx.guild).hhsingle.set(toggled_single)
-        self.hhsingle[ctx.guild.id] = toggled_single
-        if toggled_single:
-            await ctx.send(f"Now responding only single sentence message.")
-        else:
-            await ctx.send(f"Now cut off at punctuation.")
+        with self.config.guild(message.guild).hhsingle() as toggled_single:
+            await self.config.guild(ctx.guild).hhsingle.set(toggled_single)
+            self.hhsingle[ctx.guild.id] = toggled_single
+            if toggled_single:
+                await ctx.send(f"Now responding only single sentence message.")
+            else:
+                await ctx.send(f"Now cut off at punctuation.")
