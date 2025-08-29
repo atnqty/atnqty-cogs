@@ -149,12 +149,12 @@ class HiHungry(commands.Cog):
     @commands.has_permissions(manage_guild=True)
     async def single(self, ctx: commands.Context):
         """Toggle between detecting only single sentence no punctuation message or not."""
-            hhsingle = self.hhsingle.get(ctx.guild.id, None)
-            self.aprocdict.setdefault(ctx.guild.id, False)
-            toggled_single = not hhsingle
-            await self.config.guild(ctx.guild).hhsingle.set(toggled_single)
-            self.hhsingle[ctx.guild.id] = toggled_single
-            if toggled_single:
-                await ctx.send(f"Now responding only single sentence message.")
-            else:
-                await ctx.send(f"Now cut off at punctuation.")
+        hhsingle = self.hhsingle.get(ctx.guild.id, None)
+        self.aprocdict.setdefault(ctx.guild.id, False)
+        toggled_single = not hhsingle
+        await self.config.guild(ctx.guild).hhsingle.set(toggled_single)
+        self.hhsingle[ctx.guild.id] = toggled_single
+        if toggled_single:
+            await ctx.send(f"Now responding only single sentence message.")
+        else:
+            await ctx.send(f"Now cut off at punctuation.")
